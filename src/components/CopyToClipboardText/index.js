@@ -30,7 +30,7 @@ const TITLE_BY_STATUS = {
 
 export const CopyToClipboardText = ({ text }) => {
   const classes = useStyles();
-  const [state, copyToClipboard] = useCopyToClipboard();
+  const [_, copyToClipboard] = useCopyToClipboard();
   const [statusCopy, setStatusCopy] = useState("copy");
 
   const onClickCopy = useCallback(() => {
