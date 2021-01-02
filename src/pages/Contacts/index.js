@@ -1,7 +1,6 @@
 import Grid from "@material-ui/core/Grid";
 import Container from "@material-ui/core/Container";
 import { makeStyles, createStyles } from "@material-ui/core/styles";
-import { useContacts } from "./useContacts";
 import { Box, Typography } from "@material-ui/core";
 import { ContactsTable } from "./ContactsTable";
 import CircularProgress from "@material-ui/core/CircularProgress";
@@ -9,6 +8,8 @@ import { ToggleDataViewMode } from "./ToggleDataViewMode";
 import { DATA_VIEW_MODES } from "./constants";
 import { useDataViewMode } from "./useDataViewMode";
 import { SpacingGrid } from "./SpacingGrid";
+import { useEffect, useState } from "react";
+import { Pagination } from "./Paginations";
 
 const useStyles = makeStyles((theme) =>
   createStyles({
@@ -23,8 +24,44 @@ const useStyles = makeStyles((theme) =>
 
 export const Contacts = () => {
   const classes = useStyles();
-  const contacts = useContacts();
   const [dataViewMode, setDataViewMode] = useDataViewMode();
+
+  const [data, setData] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isError, setError] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [dataPerPage] = useState(8);
+
+  useEffect(() => {
+    const getContacts = async () => {
+      try {
+        setIsLoading(true);
+        const response = await fetch("https://randomuser.me/api/?results=100");
+        const { results, error } = await response.json();
+        if (error) {
+          throw new Error(error);
+        }
+        setData(results);
+        setIsLoading(false);
+        setError(false);
+      } catch (error) {
+        setError(true);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    getContacts();
+  }, []);
+
+  const indexOfLastData = currentPage * dataPerPage;
+  const indexOfFirstData = indexOfLastData - dataPerPage;
+  const currentData = data.slice(indexOfFirstData, indexOfLastData);
+  const totalData = data.length;
+
+  const paginate = (numberPage) => {
+    setCurrentPage(numberPage);
+  };
+
   return (
     <Container className={classes.root}>
       <Grid container>
@@ -39,22 +76,42 @@ export const Contacts = () => {
             />
           </Box>
         </Grid>
-        <Grid item xs={12}>
+        <Grid className="text-center" item xs={12}>
           {(() => {
-            if (contacts.isLoading) {
+            if (isLoading) {
               return <CircularProgress />;
             }
 
-            if (contacts.isError) {
+            if (isError) {
               return <div>No connection...</div>;
             }
 
             if (dataViewMode === DATA_VIEW_MODES.TABLE) {
-              return <ContactsTable data={contacts.data} />;
+              return (
+                <div>
+                  <ContactsTable data={currentData} />
+                  <Pagination
+                    totalData={totalData}
+                    dataPerPage={dataPerPage}
+                    paginate={paginate}
+                    currentPage={currentPage}
+                  />
+                </div>
+              );
             }
 
             if (dataViewMode === DATA_VIEW_MODES.GRID) {
-              return <SpacingGrid data={contacts.data} />;
+              return (
+                <div>
+                  <SpacingGrid data={currentData} />
+                  <Pagination
+                    totalData={totalData}
+                    dataPerPage={dataPerPage}
+                    paginate={paginate}
+                    currentPage={currentPage}
+                  />
+                </div>
+              );
             }
             return null;
           })()}
