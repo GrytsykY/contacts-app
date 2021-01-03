@@ -9,7 +9,7 @@ import { DATA_VIEW_MODES } from "./constants";
 import { useDataViewMode } from "./useDataViewMode";
 import { SpacingGrid } from "./SpacingGrid";
 import { useEffect, useState } from "react";
-import { Pagination } from "./Paginations";
+import { BasicPagination } from "./Paginations";
 
 const useStyles = makeStyles((theme) =>
   createStyles({
@@ -36,7 +36,7 @@ export const Contacts = () => {
     const getContacts = async () => {
       try {
         setIsLoading(true);
-        const response = await fetch("https://randomuser.me/api/?results=100");
+        const response = await fetch("https://randomuser.me/api/?results=200");
         const { results, error } = await response.json();
         if (error) {
           throw new Error(error);
@@ -88,9 +88,9 @@ export const Contacts = () => {
 
             if (dataViewMode === DATA_VIEW_MODES.TABLE) {
               return (
-                <div>
+                <div className="text-center">
                   <ContactsTable data={currentData} />
-                  <Pagination
+                  <BasicPagination
                     totalData={totalData}
                     dataPerPage={dataPerPage}
                     paginate={paginate}
@@ -102,9 +102,9 @@ export const Contacts = () => {
 
             if (dataViewMode === DATA_VIEW_MODES.GRID) {
               return (
-                <div>
+                <div className="text-center">
                   <SpacingGrid data={currentData} />
-                  <Pagination
+                  <BasicPagination
                     totalData={totalData}
                     dataPerPage={dataPerPage}
                     paginate={paginate}

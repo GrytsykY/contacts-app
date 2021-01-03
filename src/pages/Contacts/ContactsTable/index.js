@@ -12,7 +12,6 @@ import Avatar from "@material-ui/core/Avatar";
 import { Typography } from "@material-ui/core";
 import { CopyToClipboardText } from "../../../components/CopyToClipboardText";
 import { NATIONALITIES_HUMAN_NAME } from "../../../constants/nationality";
-import { Pagination } from "../Paginations";
 
 const useStyles = makeStyles({
   table: {},
